@@ -771,7 +771,7 @@ var pf1Weather = {
 					if (percipRoll2 <= key) {
 						var percipDuration = await pf1Weather.RollDie(percipOptions[key]["Duration"]);
 
-						var pack = game.packs.get("pf1-weather.weather-buffs");
+						var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
 						let buffs = [];
 						pack.index.forEach(template => buffs.push({
 							name: template.name,
@@ -780,7 +780,7 @@ var pf1Weather = {
 						let weatherName = percipOptions[key]["Precipitation"];
 						if (buffs.filter(buff => buff.name == weatherName).length > 0) {
 							let weatherCompendium = buffs.filter(buff => buff.name == weatherName)[0].id;
-							WeatherMessage += `@Compendium[pf1-weather.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
+							WeatherMessage += `@Compendium[pf1-weather-blossems.weather-blossems-buffs${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						} else {
 							WeatherMessage += weatherName + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						}
@@ -788,14 +788,14 @@ var pf1Weather = {
 						let Wind = await pf1Weather.GetWindData();
 						let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
 						if ((weatherName === "Fog, Heavy" || weatherName === "Fog, Medium" || weatherName === "Fog, Light") && Wind.WindStrength === "Light") {
-							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-blossems-buffs${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
 							WeatherMessage += (Wind.BlownAwaySize != "" ? "Blown Away Size: " + Wind.BlownAwaySize + "<br>" : "");
 							WeatherMessage += (Wind.SkillPenalty > 0 ? "Skill Penalty: " + Wind.SkillPenalty + "<br>" : "");
 						} else {
-							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-blossems-buffs${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -820,14 +820,14 @@ var pf1Weather = {
 
 				}
 				let Wind = await pf1Weather.GetWindData();
-				var pack = game.packs.get("pf1-weather.weather-buffs");
+				var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
 				let buffs = [];
 				pack.index.forEach(template => buffs.push({
 					name: template.name,
 					id: template._id
 				}));
 				let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
-				WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+				WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-blossems-buffs${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 				WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -837,14 +837,14 @@ var pf1Weather = {
 			WeatherMessage += "</div>";
 		}
 		//Add Compendium Journals to end of the message
-		var pack = game.packs.get("pf1-weather.pf1-weather-journals");
+		var pack = game.packs.get("pf1-weather-blossems.pf1-weather-blossems-journals");
 		let journals = [];
 		pack.index.forEach(template => journals.push({
 			name: template.name,
 			id: template._id
 		}));
 
-		everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather.pf1-weather-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
+		everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather-blossems.pf1-weather-blossems-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
 		//console.log(WeatherMessage);
 		if (game.system.gridUnits == "m") {
 			WeatherMessage = WeatherMessage.replaceAll(theTemp + "° F", Math.floor((theTemp - 32) * 5 / 9) + "° C");
@@ -955,7 +955,7 @@ var pf1Weather = {
 					if (percipRoll2 <= key) {
 						var percipDuration = await pf1Weather.RollDie(percipOptions[key]["Duration"]);
 
-						var pack = game.packs.get("pf1-weather.weather-buffs");
+						var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
 						let buffs = [];
 						pack.index.forEach(template => buffs.push({
 							name: template.name,
@@ -964,7 +964,7 @@ var pf1Weather = {
 						let weatherName = percipOptions[key]["Precipitation"];
 						if (buffs.filter(buff => buff.name == weatherName).length > 0) {
 							let weatherCompendium = buffs.filter(buff => buff.name == weatherName)[0].id;
-							WeatherMessage += `@Compendium[pf1-weather.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
+							WeatherMessage += `@Compendium[pf1-weather-blossems.weather-blossems-buffs${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						} else {
 							WeatherMessage += weatherName + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						}
@@ -972,14 +972,14 @@ var pf1Weather = {
 						let Wind = await pf1Weather.GetWindData();
 						let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
 						if ((weatherName === "Fog, Heavy" || weatherName === "Fog, Medium" || weatherName === "Fog, Light") && Wind.WindStrength === "Light") {
-							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-blossems-buffs${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
 							WeatherMessage += (Wind.BlownAwaySize != "" ? "Blown Away Size: " + Wind.BlownAwaySize + "<br>" : "");
 							WeatherMessage += (Wind.SkillPenalty > 0 ? "Skill Penalty: " + Wind.SkillPenalty + "<br>" : "");
 						} else {
-							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-blossems-buffs${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -1006,14 +1006,14 @@ var pf1Weather = {
 
 				}
 				let Wind = await pf1Weather.GetWindData();
-				var pack = game.packs.get("pf1-weather.weather-buffs");
+				var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
 				let buffs = [];
 				pack.index.forEach(template => buffs.push({
 					name: template.name,
 					id: template._id
 				}));
 				let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
-				WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+				WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-blossems-buffs${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 				WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -1022,13 +1022,13 @@ var pf1Weather = {
 			}
 			WeatherMessage += "</div>";
 			//Add Compendium Journals to end of the message
-			var pack = game.packs.get("pf1-weather.pf1-weather-journals");
+			var pack = game.packs.get("pf1-weather-blossems.pf1-weather-blossems-journals");
 			let journals = [];
 			pack.index.forEach(template => journals.push({
 				name: template.name,
 				id: template._id
 			}));
-			everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather.pf1-weather-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
+			everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather-blossems.pf1-weather-blossems-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
 			let theDate = pf1Weather.GetDateForNote({
 				year: (SimpleCalendar.api.getCurrentYear().numericRepresentation),
 				month: (SimpleCalendar.api.getCurrentMonth().numericRepresentation - 1),

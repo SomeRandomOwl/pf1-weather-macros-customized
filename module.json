@@ -1,7 +1,7 @@
 {
 	"name": "pf1-weather-blossems",
 	"title": "Pathfinder 1E Weather - (Blosems)",
-	"version": "1.0.13",
+	"version": "1.0.14",
 	"relationships": {
 		"systems": [{
 			"id": "pf1",
@@ -22,31 +22,31 @@
 		}
 	],
 	"styles": [
-		"css/pf1-weather.css"
+		"css/pf1-weather-blossems.css"
 	],
 	"scripts": [
 		"js/Weather Macro.js"
 	],
 	"packs": [
 		{
-			"name": "pf1-weather-journals",
-			"label": "PF1 Weather Journals",
+			"name": "pf1-weather-blossems-journals",
+			"label": "PF1 Weather blossems Journals",
 			"system": "pf1",
-			"path": "./packs/pf1-weather-journals.db",
+			"path": "./packs/pf1-weather-blossems-journals.db",
 			"type": "JournalEntry"
 		},
 		{
-			"name": "weather-buffs",
-			"label": "PF1 Weather Buffs",
+			"name": "weather-buffs-blossems",
+			"label": "PF1 Weather Buffs blossems",
 			"system": "pf1",
-			"path": "./packs/weather-buffs.db",
+			"path": "./packs/weather-blossems-buffs.db",
 			"type": "Item"
 		},
 		{
-			"name": "pf1-weather-macros",
-			"label": "PF1 Weather Macros",
+			"name": "pf1-weather-blossems-macros",
+			"label": "PF1 Weather blossems Macros",
 			"system": "pf1",
-			"path": "./packs/pf1-weather-macros.db",
+			"path": "./packs/pf1-weather-blossems-macros.db",
 			"type": "Macro"
 		}
 	],
@@ -59,7 +59,7 @@
 		{
 			"name": "Pathfinder Weather Packs",
 			"sorting": "a",
-			"packs": ["pf1-weather-journals", "weather-buffs", "pf1-weather-macros"],
+			"packs": ["pf1-weather-blossems-journals", "weather-blossems-buffs", "pf1-weather-blossems-macros"],
 			"folders": []
 		}
 	],
