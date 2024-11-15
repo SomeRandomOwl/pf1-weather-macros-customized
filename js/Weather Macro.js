@@ -7,33 +7,33 @@ var pf1Weather = {
 	
 	/*
 	Table: Climate Baselines
-	Climate		Winter Temp.	Spring Temp.	Summer Temp.	Fall Temp.	Precipitation Adjustment
+	Climate		Tōji Temp.	Risshun Temp.	Seimei Temp.	Risshū Temp.	Precipitation Adjustment
 	Cold		20º F			30º F			40º F			30º F		Decrease frequency and intensity by one step
 	Temperate	30º F			60º F			80º F			60º F		—
 	Tropical	50º F			75º F			95º F			75º F		Increase frequency and intensity by one step
 	*/
 	ClimateBaselines: {
 		"Cold": {
-			"Winter": 20,
-			"Spring": 30,
-			"Summer": 40,
-			"Fall": 30,
+			"Tōji": 0,
+			"Risshun": 20,
+			"Seimei": 30,
+			"Risshū": 20,
 			"Percip Freq Mod": -1,
 			"Percip Inten Mod": -1
 		},
 		"Temperate": {
-			"Winter": 30,
-			"Spring": 60,
-			"Summer": 80,
-			"Fall": 60,
+			"Tōji": 10,
+			"Risshun": 30,
+			"Seimei": 40,
+			"Risshū": 30,
 			"Percip Freq Mod": 0,
 			"Percip Inten Mod": 0
 		},
 		"Tropical": {
-			"Winter": 50,
-			"Spring": 75,
-			"Summer": 95,
-			"Fall": 75,
+			"Tōji": 20,
+			"Risshun": 30,
+			"Seimei": 50,
+			"Risshū": 30,
 			"Percip Freq Mod": 1,
 			"Percip Inten Mod": 1
 		},
@@ -47,17 +47,17 @@ var pf1Weather = {
 	*/
 	ElevationModifiers: {
 		"Sea level": {
-			"Temp Mod": 10,
+			"Temp Mod": -10,
 			"Percip Baseline": 2,
 			"Percip Freq Mod": 0
 		},
 		"Lowland": {
-			"Temp Mod": 0,
+			"Temp Mod": -15,
 			"Percip Baseline": 1,
 			"Percip Freq Mod": 0
 		},
 		"Highland": {
-			"Temp Mod": -10,
+			"Temp Mod": -20,
 			"Percip Baseline": 1,
 			"Percip Freq Mod": -1
 		},
@@ -215,28 +215,28 @@ var pf1Weather = {
 	/*
 	Table: Seasonal Baselines
 	Season		Cold or Temperate Climate Precip. Frequency				Tropical Climate Precip. Frequency
-	Spring		Intermittent											Common
-	Summer		Common													Intermittent
-	Fall		Intermittent											Common
-	Winter		Rare													Rare
+	Risshun		Intermittent											Common
+	Seimei		Common													Intermittent
+	Risshū		Intermittent											Common
+	Tōji		Rare													Rare
 	*/
 	SeasonalPercipitationBaselines: {
-		"Spring": {
+		"Risshun": {
 			"Cold": 2,
 			"Temperate": 2,
 			"Tropical": 3
 		},
-		"Summer": {
+		"Seimei": {
 			"Cold": 3,
 			"Temperate": 3,
 			"Tropical": 2
 		},
-		"Fall": {
+		"Risshū": {
 			"Cold": 2,
 			"Temperate": 2,
 			"Tropical": 3
 		},
-		"Winter": {
+		"Tōji": {
 			"Cold": 1,
 			"Temperate": 1,
 			"Tropical": 1
@@ -662,10 +662,10 @@ var pf1Weather = {
 					<option value="Tropical">Tropical</option>
 				</select>
 				<select id="seasonList">
-					<option value="Winter">Winter</option>
-					<option value="Spring">Spring</option>
-					<option value="Summer">Summer</option>
-					<option value="Fall">Fall</option>
+					<option value="Tōji">Tōji</option>
+					<option value="Risshun">Risshun</option>
+					<option value="Seimei">Seimei</option>
+					<option value="Risshū">Risshū</option>
 				</select>
 				<select id="elevationList">
 					<option value="Sea level">Sea level(Below 1,000 ft.)</option>
@@ -694,10 +694,10 @@ var pf1Weather = {
 					<option value="Tropical">Tropical</option>
 				</select>
 				<select id="seasonList">
-					<option value="Winter">Winter</option>
-					<option value="Spring">Spring</option>
-					<option value="Summer">Summer</option>
-					<option value="Fall">Fall</option>
+					<option value="Tōji">Tōji</option>
+					<option value="Risshun">Risshun</option>
+					<option value="Seimei">Seimei</option>
+					<option value="Risshū">Risshū</option>
 				</select>
 				<select id="elevationList">
 					<option value="Sea level">Sea level(Below 1,000 ft.)</option>
@@ -795,9 +795,9 @@ var pf1Weather = {
 				WeatherMessage += "Cloud Cover: " + cloudCover + "<br>";
 				if(cloudCover === "Overcast"){
 					WeatherMessage += "Overcast conditions grant concealment for creatures flying at high altitudes.<br>";
-					if(season == "Fall" || season == "Winter"){
+					if(season == "Risshū" || season == "Tōji"){
 						WeatherMessage += "Temperature is 10° F higher today.<br>";
-					}else if(season == "Spring" || season == "Summer"){
+					}else if(season == "Risshun" || season == "Seimei"){
 						WeatherMessage += "Temperature is 10° F lower today.<br>";
 					}
 					
@@ -827,12 +827,12 @@ var pf1Weather = {
 			WeatherMessage = WeatherMessage.replaceAll(theTemp + "° F", Math.floor((theTemp - 32) * 5 / 9) + "° C");
 		}
 		let chatData = {
-		   user: game.user.id,
-		   speaker: {
-			  alias: "Weather Report"
-		   },
-		   content: WeatherMessage,
-		   whisper : ChatMessage.getWhisperRecipients("Gamemaster")
+			user: game.user.id,
+			speaker: {
+				alias: "Weather Report"
+			},
+			content: WeatherMessage,
+			whisper : ChatMessage.getWhisperRecipients("Gamemaster")
 		};
 		ChatMessage.create(chatData, {});
 		
@@ -966,10 +966,10 @@ var pf1Weather = {
 				WeatherMessage += "Cloud Cover: " + cloudCover + "<br>";
 				if(cloudCover === "Overcast"){
 					WeatherMessage += "Overcast conditions grant concealment for creatures flying at high altitudes.<br>";
-					if(season == "Fall" || season == "Winter"){
+					if(season == "Risshū" || season == "Tōji"){
 						WeatherMessage = WeatherMessage.replace(theTemp + "°", (theTemp + 10) + "°")
 						//WeatherMessage += "Temperature is 10° F higher today.<br>";
-					}else if(season == "Spring" || season == "Summer"){
+					}else if(season == "Risshun" || season == "Seimei"){
 						WeatherMessage = WeatherMessage.replace(theTemp + "°", (theTemp - 10) + "°")
 						//WeatherMessage += "Temperature is 10° F lower today.<br>";
 					}
@@ -1013,12 +1013,12 @@ var pf1Weather = {
 		//console.log(WeatherMessage);
 		
 		/*let chatData = {
-		   user: game.user.id,
-		   speaker: {
-			  alias: "Weather Report"
-		   },
-		   content: WeatherMessage,
-		   whisper : ChatMessage.getWhisperRecipients("Gamemaster")
+			user: game.user.id,
+			speaker: {
+				alias: "Weather Report"
+			},
+			content: WeatherMessage,
+			whisper : ChatMessage.getWhisperRecipients("Gamemaster")
 		};
 		ChatMessage.create(chatData, {});*/
 		
@@ -1112,12 +1112,12 @@ var pf1Weather = {
 				messageData += theNote.pages.contents[0].text.content;
 			}
 			let chatData = {
-			   user: game.user.id,
-			   speaker: {
-				  alias: "Weather Report"
-			   },
-			   content: messageData,
-			   whisper: game.users.filter(x => x.isGM).map(x => x.id)
+				user: game.user.id,
+				speaker: {
+					alias: "Weather Report"
+				},
+				content: messageData,
+				whisper: game.users.filter(x => x.isGM).map(x => x.id)
 			};
 			ChatMessage.create(chatData, {});
 		}else{
@@ -1134,11 +1134,11 @@ var pf1Weather = {
 				messageData += theNote.pages.contents[0].text.content;
 			}
 			let chatData = {
-			   user: game.user.id,
-			   speaker: {
-				  alias: "Weather Report"
-			   },
-			   content: messageData
+				user: game.user.id,
+				speaker: {
+					alias: "Weather Report"
+				},
+				content: messageData
 			};
 			ChatMessage.create(chatData, {});
 		}else{
@@ -1174,7 +1174,7 @@ function populateSidePanel(event, element){
 	for(let i = element.children.length-1; i > -1; i--){
 		element.removeChild(element.children[i]);
 	}
-    if(element){
+	if(element){
 		let prevClimate = game.user.getFlag("pf1-weather","climate");
 		let prevSeason = game.user.getFlag("pf1-weather","season");
 		let prevElevation = game.user.getFlag("pf1-weather","elevation");
@@ -1187,7 +1187,7 @@ function populateSidePanel(event, element){
 		let dateHeader = document.createElement('h3');
 		dateHeader.innerText = `Current Date: ${SimpleCalendar.api.currentDateTimeDisplay().date}`;
 		element.append(dateHeader);
-	   
+		
 		let seasons = SimpleCalendar.api.getAllSeasons().map(x => x.name);
 		let curSeason = SimpleCalendar.api.getCurrentSeason().name;
 		let formElement = document.createElement("form");
