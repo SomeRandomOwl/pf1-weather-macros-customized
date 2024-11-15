@@ -1,10 +1,10 @@
 var pf1Weather = {
 	theClimate: "",
-	
+
 	theSeason: "",
-	
+
 	baselineTemp: 0,
-	
+
 	/*
 	Table: Climate Baselines
 	Climate		Tōji Temp.	Risshun Temp.	Seimei Temp.	Risshū Temp.	Precipitation Adjustment
@@ -62,7 +62,7 @@ var pf1Weather = {
 			"Percip Freq Mod": -1
 		},
 	},
-	
+
 	ClimateVariations: {
 		/*
 		Table: Cold Region Temperature Variations
@@ -197,7 +197,7 @@ var pf1Weather = {
 			}
 		}
 	},
-	
+
 	PercipitationFrequency: [
 		"Drought",
 		"Rare",
@@ -205,7 +205,7 @@ var pf1Weather = {
 		"Common",
 		"Constant"
 	],
-	
+
 	PercipitationIntensity: [
 		"Light",
 		"Medium",
@@ -273,7 +273,7 @@ var pf1Weather = {
 			"Percip Inten Mod": 0
 		}
 	},
-	
+
 	WindData: {
 		50: {
 			WindStrength: "Light",
@@ -321,14 +321,14 @@ var pf1Weather = {
 			SkillPenalty: -8
 		}
 	},
-	
+
 	CloudCoverData: {
 		50: "None",
 		70: "Light Clouds",
 		85: "Medium Clouds",
 		100: "Overcast"
 	},
-	
+
 	PercipitationTables: {
 		"Light": {
 			/*
@@ -632,29 +632,29 @@ var pf1Weather = {
 			}
 		}
 	},
-	
-	Main: async function(){
+
+	Main: async function() {
 		await pf1Weather.CheckClimate();
 	},
-	
-	Main_SimpleCalendar: async function(){
-		if(SimpleCalendar == null){
+
+	Main_SimpleCalendar: async function() {
+		if (SimpleCalendar == null) {
 			ui.notifications.warn("Couldn't locate SimpleCalendar, using standalone method.");
 			await pf1Weather.CheckClimate();
-		}else{
+		} else {
 			await pf1Weather.CheckClimate_SimpleCalendar();
 		}
-		
+
 	},
-	
-	RollDie: async function (dice){
+
+	RollDie: async function(dice) {
 		var r = new Roll(dice);
 		await r.roll();
 		return (r.total);
 	},
-	
-	CheckClimate: async function (){
-		
+
+	CheckClimate: async function() {
+
 		let content = `<form>
 				<select id="climateList">
 					<option value="Cold">Cold</option>
@@ -673,20 +673,27 @@ var pf1Weather = {
 					<option value="Highland">Highland (Above 5,000 ft.)</option>
 				</select>
 			</form>`;
-		if(game.system.gridUnits != "ft"){
-			content = content.replaceAll("1,000 ft.","305 m.");
-			content = content.replaceAll("5,000 ft.","1524 m.");
+		if (game.system.gridUnits != "ft") {
+			content = content.replaceAll("1,000 ft.", "305 m.");
+			content = content.replaceAll("5,000 ft.", "1524 m.");
 		}
 		new Dialog({
 			title: "Weather",
-			content: content, 
-			buttons : { OK : {label : `Ok`, callback : async (html) => { pf1Weather.WeatherRolls(html.find('#climateList').val(),html.find('#seasonList').val(),html.find('#elevationList').val())} } }
+			content: content,
+			buttons: {
+				OK: {
+					label: `Ok`,
+					callback: async (html) => {
+						pf1Weather.WeatherRolls(html.find('#climateList').val(), html.find('#seasonList').val(), html.find('#elevationList').val())
+					}
+				}
+			}
 		}).render(true);
-		
+
 	},
-	
-	CheckClimate_SimpleCalendar: async function (){
-		
+
+	CheckClimate_SimpleCalendar: async function() {
+
 		let content = `<form>
 				<select id="climateList">
 					<option value="Cold">Cold</option>
@@ -707,107 +714,120 @@ var pf1Weather = {
 			</form>`;
 		new Dialog({
 			title: "Weather",
-			content: content, 
-			buttons : { OK : {label : `Ok`, callback : async (html) => { pf1Weather.SimpleCalendarWeatherRolls(html.find('#climateList').val(),html.find('#seasonList').val(),html.find('#elevationList').val())} } }
+			content: content,
+			buttons: {
+				OK: {
+					label: `Ok`,
+					callback: async (html) => {
+						pf1Weather.SimpleCalendarWeatherRolls(html.find('#climateList').val(), html.find('#seasonList').val(), html.find('#elevationList').val())
+					}
+				}
+			}
 		}).render(true);
-		
+
 	},
 
-	WeatherRolls: async function (climate, season, elevation){
-		game.user.setFlag("pf1-weather-blossems","climate",climate);
-		game.user.setFlag("pf1-weather-blossems","season",season);
-		game.user.setFlag("pf1-weather-blossems","elevation",elevation);
+	WeatherRolls: async function(climate, season, elevation) {
+		game.user.setFlag("pf1-weather-blossems", "climate", climate);
+		game.user.setFlag("pf1-weather-blossems", "season", season);
+		game.user.setFlag("pf1-weather-blossems", "elevation", elevation);
 		pf1Weather.theClimate = climate;
 		pf1Weather.theSeason = season;
 		pf1Weather.baselineTemp = pf1Weather.ClimateBaselines[climate][season];
 		let ClimateVar = await pf1Weather.GetClimateVariation(climate);
 		let theTemp = pf1Weather.baselineTemp + pf1Weather.ElevationModifiers[elevation]["Temp Mod"] + ClimateVar[0];
 		let percipitation = pf1Weather.SeasonalPercipitationBaselines[season][climate] + pf1Weather.ClimateBaselines[climate]["Percip Freq Mod"] + pf1Weather.ElevationModifiers[elevation]["Percip Freq Mod"];
-		if(percipitation < 0){
+		if (percipitation < 0) {
 			percipitation = 0;
-		}else if(percipitation > 4){
+		} else if (percipitation > 4) {
 			percipitation = 4;
 		}
 		let WeatherMessage = "<h3 class='WeatherMessage'>" + climate + " climate in " + season + " at " + elevation + "</h3>" + "The temperature is <b>" + theTemp + "° F</b> for the next " + ClimateVar[1] + " days ";
 		var everPercip = false;
-		for(var day = 1; day <= ClimateVar[1]; day++){
+		for (var day = 1; day <= ClimateVar[1]; day++) {
 			WeatherMessage += "<div style='border:1px solid #b3b3b3;'><h3>Day " + day + "</h3>"
 			var percipRoll = await pf1Weather.RollDie("1d100");
 			let cloudCover = await pf1Weather.GetCloudCoverData();
-			
+
 			//WeatherMessage += "Cloud Cover: " + cloudCover + "<br>";
-			if(percipRoll <= pf1Weather.PrecipitationChances[pf1Weather.PercipitationFrequency[percipitation]]["chance"]){
+			if (percipRoll <= pf1Weather.PrecipitationChances[pf1Weather.PercipitationFrequency[percipitation]]["chance"]) {
 				everPercip = true;
 				let percipIntensity = pf1Weather.ElevationModifiers[elevation]["Percip Baseline"] + pf1Weather.ClimateBaselines[climate]["Percip Inten Mod"];
 				let percipOptions;
-				
+
 				//start time 1d12 1d6 a.m./p.m.
 				let startTime = (await pf1Weather.RollDie("1d12")) + (await pf1Weather.RollDie("1d6") < 4 ? " a.m." : " p.m.");
-				
+
 				//Set percipOptions based on if theTemp is in the Freezing range
-				if(theTemp <= 32){
+				if (theTemp <= 32) {
 					percipOptions = pf1Weather.PercipitationTables[pf1Weather.PercipitationIntensity[percipIntensity]]["Frozen"];
-				}else{
+				} else {
 					percipOptions = pf1Weather.PercipitationTables[pf1Weather.PercipitationIntensity[percipIntensity]]["Unfrozen"];
 				}
-				
+
 				//Roll for what kind of Precipitation and Duration for this day
 				var percipRoll2 = await pf1Weather.RollDie("1d100");
-				for(let key of Object.keys(percipOptions)){
-					if(percipRoll2 <= key){
+				for (let key of Object.keys(percipOptions)) {
+					if (percipRoll2 <= key) {
 						var percipDuration = await pf1Weather.RollDie(percipOptions[key]["Duration"]);
-						
-						var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
+
+						var pack = game.packs.get("pf1-weather.weather-buffs");
 						let buffs = [];
-						pack.index.forEach(template => buffs.push({name: template.name,id: template._id}));
+						pack.index.forEach(template => buffs.push({
+							name: template.name,
+							id: template._id
+						}));
 						let weatherName = percipOptions[key]["Precipitation"];
-						if(buffs.filter(buff => buff.name == weatherName).length > 0){
+						if (buffs.filter(buff => buff.name == weatherName).length > 0) {
 							let weatherCompendium = buffs.filter(buff => buff.name == weatherName)[0].id;
-							WeatherMessage += `@Compendium[pf1-weather-blossems.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
-						}else{
+							WeatherMessage += `@Compendium[pf1-weather.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
+						} else {
 							WeatherMessage += weatherName + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						}
 						WeatherMessage += "Cloud Cover: Overcast<br>";
 						let Wind = await pf1Weather.GetWindData();
 						let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
-						if((weatherName === "Fog, Heavy" || weatherName === "Fog, Medium" || weatherName === "Fog, Light") && Wind.WindStrength === "Light"){
-							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+						if ((weatherName === "Fog, Heavy" || weatherName === "Fog, Medium" || weatherName === "Fog, Light") && Wind.WindStrength === "Light") {
+							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
 							WeatherMessage += (Wind.BlownAwaySize != "" ? "Blown Away Size: " + Wind.BlownAwaySize + "<br>" : "");
 							WeatherMessage += (Wind.SkillPenalty > 0 ? "Skill Penalty: " + Wind.SkillPenalty + "<br>" : "");
-						}else{
-							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+						} else {
+							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
 							WeatherMessage += (Wind.BlownAwaySize != "" ? "Blown Away Size: " + Wind.BlownAwaySize + "<br>" : "");
 							WeatherMessage += (Wind.SkillPenalty > 0 ? "Skill Penalty: " + Wind.SkillPenalty + "<br>" : "");
 						}
-						
+
 						break;
 					}
 				}
-			}else{
+			} else {
 				//No Precipitation so Clear Skies WOOHOO
 				WeatherMessage += "Skies will be clear on day " + day + "<br>";
 				WeatherMessage += "Cloud Cover: " + cloudCover + "<br>";
-				if(cloudCover === "Overcast"){
+				if (cloudCover === "Overcast") {
 					WeatherMessage += "Overcast conditions grant concealment for creatures flying at high altitudes.<br>";
-					if(season == "Risshū" || season == "Tōji"){
+					if (season == "Risshū" || season == "Tōji") {
 						WeatherMessage += "Temperature is 10° F higher today.<br>";
-					}else if(season == "Risshun" || season == "Seimei"){
+					} else if (season == "Risshun" || season == "Seimei") {
 						WeatherMessage += "Temperature is 10° F lower today.<br>";
 					}
-					
+
 				}
 				let Wind = await pf1Weather.GetWindData();
-				var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
+				var pack = game.packs.get("pf1-weather.weather-buffs");
 				let buffs = [];
-				pack.index.forEach(template => buffs.push({name: template.name,id: template._id}));
+				pack.index.forEach(template => buffs.push({
+					name: template.name,
+					id: template._id
+				}));
 				let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
-				WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+				WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 				WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -817,13 +837,16 @@ var pf1Weather = {
 			WeatherMessage += "</div>";
 		}
 		//Add Compendium Journals to end of the message
-		var pack = game.packs.get("pf1-weather-blossems.pf1-weather-blossems-journals");
+		var pack = game.packs.get("pf1-weather.pf1-weather-journals");
 		let journals = [];
-		pack.index.forEach(template => journals.push({name: template.name,id: template._id}));
-		
-		everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather-blossems.pf1-weather-blossems-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
+		pack.index.forEach(template => journals.push({
+			name: template.name,
+			id: template._id
+		}));
+
+		everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather.pf1-weather-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
 		//console.log(WeatherMessage);
-		if(game.system.gridUnits == "m"){
+		if (game.system.gridUnits == "m") {
 			WeatherMessage = WeatherMessage.replaceAll(theTemp + "° F", Math.floor((theTemp - 32) * 5 / 9) + "° C");
 		}
 		let chatData = {
@@ -832,155 +855,165 @@ var pf1Weather = {
 				alias: "Weather Report"
 			},
 			content: WeatherMessage,
-			whisper : ChatMessage.getWhisperRecipients("Gamemaster")
+			whisper: ChatMessage.getWhisperRecipients("Gamemaster")
 		};
 		ChatMessage.create(chatData, {});
-		
+
 	},
 
-	ViewLastWeatherRoll: function (){
+	ViewLastWeatherRoll: function() {
 		let chatData = {
-				user: game.user.id,
-				speaker: {
-					alias: "Weather Report"
-				},
-				content: document.querySelectorAll(".WeatherMessage")[document.querySelectorAll(".WeatherMessage").length - 1].parentElement.innerHTML,
-				whisper : ChatMessage.getWhisperRecipients("Gamemaster")
-			};
-			ChatMessage.create(chatData, {});
-		
+			user: game.user.id,
+			speaker: {
+				alias: "Weather Report"
+			},
+			content: document.querySelectorAll(".WeatherMessage")[document.querySelectorAll(".WeatherMessage").length - 1].parentElement.innerHTML,
+			whisper: ChatMessage.getWhisperRecipients("Gamemaster")
+		};
+		ChatMessage.create(chatData, {});
+
 	},
 
-	GetClimateVariation: async function (climate){
+	GetClimateVariation: async function(climate) {
 		let r = await pf1Weather.RollDie("1d100");
-		for(let key of Object.keys(pf1Weather.ClimateVariations[climate])){
-			if(r <= key){
+		for (let key of Object.keys(pf1Weather.ClimateVariations[climate])) {
+			if (r <= key) {
 				let obj = [0, 0];
-				await pf1Weather.RollDie(pf1Weather.ClimateVariations[climate][key]["Variation"]).then((response) => {obj[0] = pf1Weather.ClimateVariations[climate][key]["Multiplier"] * response});
-				await pf1Weather.RollDie(pf1Weather.ClimateVariations[climate][key]["Duration"]).then((response) => {obj[1] = response});
+				await pf1Weather.RollDie(pf1Weather.ClimateVariations[climate][key]["Variation"]).then((response) => {
+					obj[0] = pf1Weather.ClimateVariations[climate][key]["Multiplier"] * response
+				});
+				await pf1Weather.RollDie(pf1Weather.ClimateVariations[climate][key]["Duration"]).then((response) => {
+					obj[1] = response
+				});
 				return obj;
 			}
 		}
 	},
 
-	GetWindData: async function (){
+	GetWindData: async function() {
 		let roll = await pf1Weather.RollDie("1d100");
-		for(let key of Object.keys(pf1Weather.WindData)){
-			if(roll <= key){
+		for (let key of Object.keys(pf1Weather.WindData)) {
+			if (roll <= key) {
 				return pf1Weather.WindData[key];
 			}
 		}
 	},
-	
-	GetCloudCoverData: async function (){
+
+	GetCloudCoverData: async function() {
 		let roll = await pf1Weather.RollDie("1d100");
-		for(let key of Object.keys(pf1Weather.CloudCoverData)){
-			if(roll <= key){
+		for (let key of Object.keys(pf1Weather.CloudCoverData)) {
+			if (roll <= key) {
 				return pf1Weather.CloudCoverData[key];
 			}
 		}
 	},
-	
-	SimpleCalendarWeatherRolls: async function (climate, season, elevation){
-		game.user.setFlag("pf1-weather-blossems","climate",climate);
-		game.user.setFlag("pf1-weather-blossems","season",season);
-		game.user.setFlag("pf1-weather-blossems","elevation",elevation);
+
+	SimpleCalendarWeatherRolls: async function(climate, season, elevation) {
+		game.user.setFlag("pf1-weather-blossems", "climate", climate);
+		game.user.setFlag("pf1-weather-blossems", "season", season);
+		game.user.setFlag("pf1-weather-blossems", "elevation", elevation);
 		pf1Weather.theClimate = climate;
 		pf1Weather.theSeason = season;
 		pf1Weather.baselineTemp = pf1Weather.ClimateBaselines[climate][season];
 		let ClimateVar = await pf1Weather.GetClimateVariation(climate);
 		let theTemp = pf1Weather.baselineTemp + pf1Weather.ElevationModifiers[elevation]["Temp Mod"] + ClimateVar[0];
 		let percipitation = pf1Weather.SeasonalPercipitationBaselines[season][climate] + pf1Weather.ClimateBaselines[climate]["Percip Freq Mod"] + pf1Weather.ElevationModifiers[elevation]["Percip Freq Mod"];
-		if(percipitation < 0){
+		if (percipitation < 0) {
 			percipitation = 0;
-		}else if(percipitation > 4){
+		} else if (percipitation > 4) {
 			percipitation = 4;
 		}
-		
-		
+
+
 		console.log(SimpleCalendar.api.getCurrentDay().numericRepresentation + ":" + (SimpleCalendar.api.getCurrentDay().numericRepresentation + ClimateVar[1]));
-		for(var day = SimpleCalendar.api.getCurrentDay().numericRepresentation; day <= SimpleCalendar.api.getCurrentDay().numericRepresentation + ClimateVar[1]; day++){
+		for (var day = SimpleCalendar.api.getCurrentDay().numericRepresentation; day <= SimpleCalendar.api.getCurrentDay().numericRepresentation + ClimateVar[1]; day++) {
 			var everPercip = false;
 			let WeatherMessage = "<h3 class='WeatherMessage'>" + climate + " climate in " + season + " at " + elevation + "</h3>" + "The temperature is <b>" + theTemp + "° F</b><br>";
 			//WeatherMessage += "<div style='border:1px solid #b3b3b3;'><h3>Day " + day + "</h3>"
 			var percipRoll = await pf1Weather.RollDie("1d100");
 			let cloudCover = await pf1Weather.GetCloudCoverData();
-			
+
 			//WeatherMessage += "Cloud Cover: " + cloudCover + "<br>";
-			if(percipRoll <= pf1Weather.PrecipitationChances[pf1Weather.PercipitationFrequency[percipitation]]["chance"]){
+			if (percipRoll <= pf1Weather.PrecipitationChances[pf1Weather.PercipitationFrequency[percipitation]]["chance"]) {
 				everPercip = true;
 				let percipIntensity = pf1Weather.ElevationModifiers[elevation]["Percip Baseline"] + pf1Weather.ClimateBaselines[climate]["Percip Inten Mod"];
 				let percipOptions;
-				
+
 				//start time 1d12 1d6 a.m./p.m.
 				let startTime = (await pf1Weather.RollDie("1d12")) + (await pf1Weather.RollDie("1d6") < 4 ? " a.m." : " p.m.");
-				
+
 				//Set percipOptions based on if theTemp is in the Freezing range
-				if(theTemp <= 32){
+				if (theTemp <= 32) {
 					percipOptions = pf1Weather.PercipitationTables[pf1Weather.PercipitationIntensity[percipIntensity]]["Frozen"];
-				}else{
+				} else {
 					percipOptions = pf1Weather.PercipitationTables[pf1Weather.PercipitationIntensity[percipIntensity]]["Unfrozen"];
 				}
-				
+
 				//Roll for what kind of Precipitation and Duration for this day
 				var percipRoll2 = await pf1Weather.RollDie("1d100");
-				for(let key of Object.keys(percipOptions)){
-					if(percipRoll2 <= key){
+				for (let key of Object.keys(percipOptions)) {
+					if (percipRoll2 <= key) {
 						var percipDuration = await pf1Weather.RollDie(percipOptions[key]["Duration"]);
-						
-						var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
+
+						var pack = game.packs.get("pf1-weather.weather-buffs");
 						let buffs = [];
-						pack.index.forEach(template => buffs.push({name: template.name,id: template._id}));
+						pack.index.forEach(template => buffs.push({
+							name: template.name,
+							id: template._id
+						}));
 						let weatherName = percipOptions[key]["Precipitation"];
-						if(buffs.filter(buff => buff.name == weatherName).length > 0){
+						if (buffs.filter(buff => buff.name == weatherName).length > 0) {
 							let weatherCompendium = buffs.filter(buff => buff.name == weatherName)[0].id;
-							WeatherMessage += `@Compendium[pf1-weather-blossems.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
-						}else{
+							WeatherMessage += `@Compendium[pf1-weather.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
+						} else {
 							WeatherMessage += weatherName + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						}
 						WeatherMessage += "Cloud Cover: Overcast<br>";
 						let Wind = await pf1Weather.GetWindData();
 						let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
-						if((weatherName === "Fog, Heavy" || weatherName === "Fog, Medium" || weatherName === "Fog, Light") && Wind.WindStrength === "Light"){
-							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+						if ((weatherName === "Fog, Heavy" || weatherName === "Fog, Medium" || weatherName === "Fog, Light") && Wind.WindStrength === "Light") {
+							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
 							WeatherMessage += (Wind.BlownAwaySize != "" ? "Blown Away Size: " + Wind.BlownAwaySize + "<br>" : "");
 							WeatherMessage += (Wind.SkillPenalty > 0 ? "Skill Penalty: " + Wind.SkillPenalty + "<br>" : "");
-						}else{
-							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+						} else {
+							WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
 							WeatherMessage += (Wind.BlownAwaySize != "" ? "Blown Away Size: " + Wind.BlownAwaySize + "<br>" : "");
 							WeatherMessage += (Wind.SkillPenalty > 0 ? "Skill Penalty: " + Wind.SkillPenalty + "<br>" : "");
 						}
-						
+
 						break;
 					}
 				}
-			}else{
+			} else {
 				//No Precipitation so Clear Skies WOOHOO
 				WeatherMessage += "No precipitation today<br>";
 				WeatherMessage += "Cloud Cover: " + cloudCover + "<br>";
-				if(cloudCover === "Overcast"){
+				if (cloudCover === "Overcast") {
 					WeatherMessage += "Overcast conditions grant concealment for creatures flying at high altitudes.<br>";
-					if(season == "Risshū" || season == "Tōji"){
+					if (season == "Risshū" || season == "Tōji") {
 						WeatherMessage = WeatherMessage.replace(theTemp + "°", (theTemp + 10) + "°")
 						//WeatherMessage += "Temperature is 10° F higher today.<br>";
-					}else if(season == "Risshun" || season == "Seimei"){
+					} else if (season == "Risshun" || season == "Seimei") {
 						WeatherMessage = WeatherMessage.replace(theTemp + "°", (theTemp - 10) + "°")
 						//WeatherMessage += "Temperature is 10° F lower today.<br>";
 					}
-					
+
 				}
 				let Wind = await pf1Weather.GetWindData();
-				var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
+				var pack = game.packs.get("pf1-weather.weather-buffs");
 				let buffs = [];
-				pack.index.forEach(template => buffs.push({name: template.name,id: template._id}));
+				pack.index.forEach(template => buffs.push({
+					name: template.name,
+					id: template._id
+				}));
 				let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
-				WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+				WeatherMessage += "Wind: " + (windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 				WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -989,29 +1022,32 @@ var pf1Weather = {
 			}
 			WeatherMessage += "</div>";
 			//Add Compendium Journals to end of the message
-			var pack = game.packs.get("pf1-weather-blossems.pf1-weather-blossems-journals");
+			var pack = game.packs.get("pf1-weather.pf1-weather-journals");
 			let journals = [];
-			pack.index.forEach(template => journals.push({name: template.name,id: template._id}));
-			everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather-blossems.pf1-weather-blossems-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
+			pack.index.forEach(template => journals.push({
+				name: template.name,
+				id: template._id
+			}));
+			everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather.pf1-weather-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
 			let theDate = pf1Weather.GetDateForNote({
 				year: (SimpleCalendar.api.getCurrentYear().numericRepresentation),
-				month: (SimpleCalendar.api.getCurrentMonth().numericRepresentation-1),
-				day: day-1,
+				month: (SimpleCalendar.api.getCurrentMonth().numericRepresentation - 1),
+				day: day - 1,
 				hour: 0,
 				minute: 0,
 				seconds: 0
 			});
-			if(game.system.gridUnits == "m"){
+			if (game.system.gridUnits == "m") {
 				WeatherMessage = WeatherMessage.replaceAll(theTemp + "° F", Math.floor((theTemp - 32) * 5 / 9) + "° C");
 			}
 			const newJournal = await SimpleCalendar.api.addNote('Weather Report', WeatherMessage, theDate, theDate, true, SimpleCalendar.api.NoteRepeat.Never, ['Weather Report']);
 			console.log(newJournal);
 		}
-		
-		
-		
+
+
+
 		//console.log(WeatherMessage);
-		
+
 		/*let chatData = {
 			user: game.user.id,
 			speaker: {
@@ -1021,26 +1057,26 @@ var pf1Weather = {
 			whisper : ChatMessage.getWhisperRecipients("Gamemaster")
 		};
 		ChatMessage.create(chatData, {});*/
-		
+
 	},
-	
-	GetDateForNote: function (date) {
+
+	GetDateForNote: function(date) {
 		console.log("Before: ", date);
 		let year = date.year;
 		let month = date.month;
 		let day = date.day;
-		if(day > SimpleCalendar.api.getCurrentMonth().numberOfDays - 1){
+		if (day > SimpleCalendar.api.getCurrentMonth().numberOfDays - 1) {
 			date = {
 				year: year,
-				month: month+1,
+				month: month + 1,
 				day: day - SimpleCalendar.api.getCurrentMonth().numberOfDays,
 				hour: 0,
 				minute: 0,
 				seconds: 0
 			};
-			if(month+1 > SimpleCalendar.api.getCurrentCalendar().months.length-1){
+			if (month + 1 > SimpleCalendar.api.getCurrentCalendar().months.length - 1) {
 				date = {
-					year: year+1,
+					year: year + 1,
 					month: 0,
 					day: day - SimpleCalendar.api.getCurrentMonth().numberOfDays,
 					hour: 0,
@@ -1053,62 +1089,62 @@ var pf1Weather = {
 		return date;
 	},
 
-	RemoveCurrentAndFutureWeatherReports: async function (){
+	RemoveCurrentAndFutureWeatherReports: async function() {
 		pf1Weather.RemoveCurrentWeatherReport();
 		pf1Weather.RemoveFutureWeatherReports();
 	},
-	
-	RemoveCurrentWeatherReport: async function (){
+
+	RemoveCurrentWeatherReport: async function() {
 		let notes = SimpleCalendar.api.searchNotes("Weather Report").filter(entry => pf1Weather.isDate(entry, SimpleCalendar.api.getCurrentYear().numericRepresentation, SimpleCalendar.api.getCurrentMonth().numericRepresentation - 1, SimpleCalendar.api.getCurrentDay().numericRepresentation - 1));
-		for(let note of notes){
+		for (let note of notes) {
 			SimpleCalendar.api.removeNote(note["_id"]);
 		}
 	},
-	
-	RemoveFutureWeatherReports: async function (){
+
+	RemoveFutureWeatherReports: async function() {
 		let notes = SimpleCalendar.api.searchNotes("Weather Report").filter(entry => pf1Weather.isAfterDate(entry, SimpleCalendar.api.getCurrentYear().numericRepresentation, SimpleCalendar.api.getCurrentMonth().numericRepresentation - 1, SimpleCalendar.api.getCurrentDay().numericRepresentation - 1));
-		for(let note of notes){
+		for (let note of notes) {
 			SimpleCalendar.api.removeNote(note["_id"]);
 		}
 	},
-	
-	RemoveAllWeatherReports: async function (){
+
+	RemoveAllWeatherReports: async function() {
 		let notes = SimpleCalendar.api.searchNotes("Weather Report");
-		for(let note of notes){
+		for (let note of notes) {
 			SimpleCalendar.api.removeNote(note["_id"]);
 		}
 	},
-	
-	isEqualOrAfterDate: function (entry, compYear, compMonth, compDay){
-		let entryDate = new Date(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year +"-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1)).getTime();
+
+	isEqualOrAfterDate: function(entry, compYear, compMonth, compDay) {
+		let entryDate = new Date(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1)).getTime();
 		let compDate = new Date(compYear + "-" + (compMonth + 1) + "-" + (compDay + 1)).getTime();
 		console.log(entry.flags["foundryvtt-simple-calendar"].noteData.startDate);
-		console.log(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year +"-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1));
+		console.log(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1));
 		console.log("Entry Date: " + entryDate + "\nComp Date: " + compDate);
 		return entryDate >= compDate;
 	},
-	
-	isAfterDate: function (entry, compYear, compMonth, compDay){
-		let entryDate = new Date(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year +"-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1)).getTime();
+
+	isAfterDate: function(entry, compYear, compMonth, compDay) {
+		let entryDate = new Date(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1)).getTime();
 		let compDate = new Date(compYear + "-" + (compMonth + 1) + "-" + (compDay + 1)).getTime();
 		console.log(entry.flags["foundryvtt-simple-calendar"].noteData.startDate);
-		console.log(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year +"-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1));
+		console.log(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1));
 		console.log("Entry Date: " + entryDate + "\nComp Date: " + compDate);
 		return entryDate > compDate;
 	},
-	
-	isDate: function (entry, compYear, compMonth, compDay){
-		let entryDate = new Date(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year +"-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1)).getTime();
+
+	isDate: function(entry, compYear, compMonth, compDay) {
+		let entryDate = new Date(entry.flags["foundryvtt-simple-calendar"].noteData.startDate.year + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.month + 1) + "-" + (entry.flags["foundryvtt-simple-calendar"].noteData.startDate.day + 1)).getTime();
 		let compDate = new Date(compYear + "-" + (compMonth + 1) + "-" + (compDay + 1)).getTime();
 		return entryDate == compDate;
 	},
-	
-	OutputCurrentWeatherToWhisper: function(){
+
+	OutputCurrentWeatherToWhisper: function() {
 		let notes = SimpleCalendar.api.searchNotes("Weather Report");
 		let note = notes.filter(x => x.flags["foundryvtt-simple-calendar"].noteData.startDate.year == SimpleCalendar.api.currentDateTime().year && x.flags["foundryvtt-simple-calendar"].noteData.startDate.month == SimpleCalendar.api.currentDateTime().month && x.flags["foundryvtt-simple-calendar"].noteData.startDate.day == SimpleCalendar.api.currentDateTime().day);
-		if(note.length >= 1){
+		if (note.length >= 1) {
 			let messageData = "";
-			for(theNote of note){
+			for (theNote of note) {
 				messageData += theNote.pages.contents[0].text.content;
 			}
 			let chatData = {
@@ -1120,17 +1156,17 @@ var pf1Weather = {
 				whisper: game.users.filter(x => x.isGM).map(x => x.id)
 			};
 			ChatMessage.create(chatData, {});
-		}else{
+		} else {
 			ui.notifications.error("No Weather Report today to output to chat.");
 		}
 	},
-	
-	OutputCurrentWeatherToChat: function(){
+
+	OutputCurrentWeatherToChat: function() {
 		let notes = SimpleCalendar.api.searchNotes("Weather Report");
 		let note = notes.filter(x => x.flags["foundryvtt-simple-calendar"].noteData.startDate.year == SimpleCalendar.api.currentDateTime().year && x.flags["foundryvtt-simple-calendar"].noteData.startDate.month == SimpleCalendar.api.currentDateTime().month && x.flags["foundryvtt-simple-calendar"].noteData.startDate.day == SimpleCalendar.api.currentDateTime().day);
-		if(note.length >= 1){
+		if (note.length >= 1) {
 			let messageData = "";
-			for(theNote of note){
+			for (theNote of note) {
 				messageData += theNote.pages.contents[0].text.content;
 			}
 			let chatData = {
@@ -1141,7 +1177,7 @@ var pf1Weather = {
 				content: messageData
 			};
 			ChatMessage.create(chatData, {});
-		}else{
+		} else {
 			ui.notifications.error("No Weather Report today to output to chat.");
 		}
 	}
@@ -1149,10 +1185,10 @@ var pf1Weather = {
 
 Hooks.on("renderApplication", (dialog, html, data) => {
 	//console.log("dialog",dialog);
-	if(dialog.data != null && dialog.data.title == "Weather"){
-		let climate = game.user.getFlag("pf1-weather-blossems","climate");
-		let season = game.user.getFlag("pf1-weather-blossems","season");
-		let elevation = game.user.getFlag("pf1-weather-blossems","elevation");
+	if (dialog.data != null && dialog.data.title == "Weather") {
+		let climate = game.user.getFlag("pf1-weather-blossems", "climate");
+		let season = game.user.getFlag("pf1-weather-blossems", "season");
+		let elevation = game.user.getFlag("pf1-weather-blossems", "elevation");
 		document.querySelector("#climateList").value = climate;
 		document.querySelector("#seasonList").value = season;
 		document.querySelector("#elevationList").value = elevation;
@@ -1160,38 +1196,38 @@ Hooks.on("renderApplication", (dialog, html, data) => {
 });
 
 // Adding a button that will generate weather reports into SimpleCalendar when clicked
-Hooks.once("renderApplication", () =>{
-	if(SimpleCalendar != null){
+Hooks.once("renderApplication", () => {
+	if (SimpleCalendar != null) {
 		// Adding a button that should show a side panel
-		if(game.user.isGM){
-			SimpleCalendar.api.addSidebarButton("PF1 Weather", "fa-solid fa-cloud", "pf1-weather-blossems-panel-class", true, populateSidePanel);
+		if (game.user.isGM) {
+			SimpleCalendar.api.addSidebarButton("PF1 Weather", "fa-solid fa-cloud", "pf1-weather-panel-class", true, populateSidePanel);
 		}
 	}
 })
 
 // Function to call to populate the side panel
-function populateSidePanel(event, element){
-	for(let i = element.children.length-1; i > -1; i--){
+function populateSidePanel(event, element) {
+	for (let i = element.children.length - 1; i > -1; i--) {
 		element.removeChild(element.children[i]);
 	}
-	if(element){
-		let prevClimate = game.user.getFlag("pf1-weather-blossems","climate");
-		let prevSeason = game.user.getFlag("pf1-weather-blossems","season");
-		let prevElevation = game.user.getFlag("pf1-weather-blossems","elevation");
-		
-		
+	if (element) {
+		let prevClimate = game.user.getFlag("pf1-weather-blossems", "climate");
+		let prevSeason = game.user.getFlag("pf1-weather-blossems", "season");
+		let prevElevation = game.user.getFlag("pf1-weather-blossems", "elevation");
+
+
 		const header = document.createElement('h2');
 		header.innerText = "PF1 Weather";
 		element.append(header);
-		
+
 		let dateHeader = document.createElement('h3');
 		dateHeader.innerText = `Current Date: ${SimpleCalendar.api.currentDateTimeDisplay().date}`;
 		element.append(dateHeader);
-		
+
 		let seasons = SimpleCalendar.api.getAllSeasons().map(x => x.name);
 		let curSeason = SimpleCalendar.api.getCurrentSeason().name;
 		let formElement = document.createElement("form");
-		
+
 		let climateSelect = document.createElement("select");
 		climateSelect.id = "climateList-SC";
 		let coldOption = document.createElement("option");
@@ -1208,10 +1244,10 @@ function populateSidePanel(event, element){
 		climateSelect.appendChild(tropOption);
 		climateSelect.value = prevClimate;
 		formElement.appendChild(climateSelect);
-		
+
 		let seasonSelect = document.createElement("select");
 		seasonSelect.id = "seasonList-SC";
-		for(let season of seasons){
+		for (let season of seasons) {
 			let optionElement = document.createElement("option");
 			optionElement.value = season;
 			optionElement.innerText = season;
@@ -1219,7 +1255,7 @@ function populateSidePanel(event, element){
 		}
 		seasonSelect.value = curSeason;
 		formElement.appendChild(seasonSelect);
-		
+
 		let elevationSelect = document.createElement("select");
 		elevationSelect.id = "elevationList-SC";
 		let seaOpt = document.createElement("option");
@@ -1236,19 +1272,19 @@ function populateSidePanel(event, element){
 		elevationSelect.appendChild(highOp);
 		elevationSelect.value = prevElevation;
 		formElement.appendChild(elevationSelect);
-		
+
 		element.append(formElement);
 		let buttons = document.createElement("div");
 		//I did all the nonsense above then realized I could have done it this way from the begining... decided it didn't need to be changed above.
 		buttons.innerHTML = `
-			<button id='pf1-weather-blossems-roll' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.SimpleCalendarWeatherRolls(document.querySelector('#climateList-SC').value,document.querySelector('#seasonList-SC').value,document.querySelector('#elevationList-SC').value)">Roll Weather</button>
-			<button id='pf1-weather-blossems-rem-today' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.RemoveCurrentWeatherReport()">Remove Todays Weather Report</button>
-			<button id='pf1-weather-blossems-rem-fut' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.RemoveFutureWeatherReports()">Remove All Future Weather Reports</button>
-			<button id='pf1-weather-blossems-rem-fut' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.RemoveCurrentAndFutureWeatherReports()">Remove Today's and All Future Weather Reports</button>
-			<button id='pf1-weather-blossems-to-chat' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.OutputCurrentWeatherToChat()">Output Today's Weather to Chat</button>
-			<button id='pf1-weather-blossems-to-gm' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.OutputCurrentWeatherToWhisper()">Whisper Today's Weather to GM</button>
+			<button id='pf1-weather-roll' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.SimpleCalendarWeatherRolls(document.querySelector('#climateList-SC').value,document.querySelector('#seasonList-SC').value,document.querySelector('#elevationList-SC').value)">Roll Weather</button>
+			<button id='pf1-weather-rem-today' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.RemoveCurrentWeatherReport()">Remove Todays Weather Report</button>
+			<button id='pf1-weather-rem-fut' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.RemoveFutureWeatherReports()">Remove All Future Weather Reports</button>
+			<button id='pf1-weather-rem-fut' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.RemoveCurrentAndFutureWeatherReports()">Remove Today's and All Future Weather Reports</button>
+			<button id='pf1-weather-to-chat' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.OutputCurrentWeatherToChat()">Output Today's Weather to Chat</button>
+			<button id='pf1-weather-to-gm' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.OutputCurrentWeatherToWhisper()">Whisper Today's Weather to GM</button>
 		`;
-		
+
 		element.append(buttons);
 	}
 }
