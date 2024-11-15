@@ -714,9 +714,9 @@ var pf1Weather = {
 	},
 
 	WeatherRolls: async function (climate, season, elevation){
-		game.user.setFlag("pf1-weather","climate",climate);
-		game.user.setFlag("pf1-weather","season",season);
-		game.user.setFlag("pf1-weather","elevation",elevation);
+		game.user.setFlag("pf1-weather-blossems","climate",climate);
+		game.user.setFlag("pf1-weather-blossems","season",season);
+		game.user.setFlag("pf1-weather-blossems","elevation",elevation);
 		pf1Weather.theClimate = climate;
 		pf1Weather.theSeason = season;
 		pf1Weather.baselineTemp = pf1Weather.ClimateBaselines[climate][season];
@@ -757,13 +757,13 @@ var pf1Weather = {
 					if(percipRoll2 <= key){
 						var percipDuration = await pf1Weather.RollDie(percipOptions[key]["Duration"]);
 						
-						var pack = game.packs.get("pf1-weather.weather-buffs");
+						var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
 						let buffs = [];
 						pack.index.forEach(template => buffs.push({name: template.name,id: template._id}));
 						let weatherName = percipOptions[key]["Precipitation"];
 						if(buffs.filter(buff => buff.name == weatherName).length > 0){
 							let weatherCompendium = buffs.filter(buff => buff.name == weatherName)[0].id;
-							WeatherMessage += `@Compendium[pf1-weather.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
+							WeatherMessage += `@Compendium[pf1-weather-blossems.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						}else{
 							WeatherMessage += weatherName + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						}
@@ -771,14 +771,14 @@ var pf1Weather = {
 						let Wind = await pf1Weather.GetWindData();
 						let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
 						if((weatherName === "Fog, Heavy" || weatherName === "Fog, Medium" || weatherName === "Fog, Light") && Wind.WindStrength === "Light"){
-							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
 							WeatherMessage += (Wind.BlownAwaySize != "" ? "Blown Away Size: " + Wind.BlownAwaySize + "<br>" : "");
 							WeatherMessage += (Wind.SkillPenalty > 0 ? "Skill Penalty: " + Wind.SkillPenalty + "<br>" : "");
 						}else{
-							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -803,11 +803,11 @@ var pf1Weather = {
 					
 				}
 				let Wind = await pf1Weather.GetWindData();
-				var pack = game.packs.get("pf1-weather.weather-buffs");
+				var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
 				let buffs = [];
 				pack.index.forEach(template => buffs.push({name: template.name,id: template._id}));
 				let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
-				WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+				WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 				WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -817,11 +817,11 @@ var pf1Weather = {
 			WeatherMessage += "</div>";
 		}
 		//Add Compendium Journals to end of the message
-		var pack = game.packs.get("pf1-weather.pf1-weather-journals");
+		var pack = game.packs.get("pf1-weather-blossems.pf1-weather-blossems-journals");
 		let journals = [];
 		pack.index.forEach(template => journals.push({name: template.name,id: template._id}));
 		
-		everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather.pf1-weather-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
+		everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather-blossems.pf1-weather-blossems-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
 		//console.log(WeatherMessage);
 		if(game.system.gridUnits == "m"){
 			WeatherMessage = WeatherMessage.replaceAll(theTemp + "° F", Math.floor((theTemp - 32) * 5 / 9) + "° C");
@@ -882,9 +882,9 @@ var pf1Weather = {
 	},
 	
 	SimpleCalendarWeatherRolls: async function (climate, season, elevation){
-		game.user.setFlag("pf1-weather","climate",climate);
-		game.user.setFlag("pf1-weather","season",season);
-		game.user.setFlag("pf1-weather","elevation",elevation);
+		game.user.setFlag("pf1-weather-blossems","climate",climate);
+		game.user.setFlag("pf1-weather-blossems","season",season);
+		game.user.setFlag("pf1-weather-blossems","elevation",elevation);
 		pf1Weather.theClimate = climate;
 		pf1Weather.theSeason = season;
 		pf1Weather.baselineTemp = pf1Weather.ClimateBaselines[climate][season];
@@ -928,13 +928,13 @@ var pf1Weather = {
 					if(percipRoll2 <= key){
 						var percipDuration = await pf1Weather.RollDie(percipOptions[key]["Duration"]);
 						
-						var pack = game.packs.get("pf1-weather.weather-buffs");
+						var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
 						let buffs = [];
 						pack.index.forEach(template => buffs.push({name: template.name,id: template._id}));
 						let weatherName = percipOptions[key]["Precipitation"];
 						if(buffs.filter(buff => buff.name == weatherName).length > 0){
 							let weatherCompendium = buffs.filter(buff => buff.name == weatherName)[0].id;
-							WeatherMessage += `@Compendium[pf1-weather.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
+							WeatherMessage += `@Compendium[pf1-weather-blossems.weather-buffs.${weatherCompendium}]{${weatherName}}` + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						}else{
 							WeatherMessage += weatherName + " will start at " + startTime + " and will last for " + percipDuration + " hours.<br>";
 						}
@@ -942,14 +942,14 @@ var pf1Weather = {
 						let Wind = await pf1Weather.GetWindData();
 						let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
 						if((weatherName === "Fog, Heavy" || weatherName === "Fog, Medium" || weatherName === "Fog, Light") && Wind.WindStrength === "Light"){
-							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
 							WeatherMessage += (Wind.BlownAwaySize != "" ? "Blown Away Size: " + Wind.BlownAwaySize + "<br>" : "");
 							WeatherMessage += (Wind.SkillPenalty > 0 ? "Skill Penalty: " + Wind.SkillPenalty + "<br>" : "");
 						}else{
-							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+							WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 							WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 							WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -976,11 +976,11 @@ var pf1Weather = {
 					
 				}
 				let Wind = await pf1Weather.GetWindData();
-				var pack = game.packs.get("pf1-weather.weather-buffs");
+				var pack = game.packs.get("pf1-weather-blossems.weather-buffs");
 				let buffs = [];
 				pack.index.forEach(template => buffs.push({name: template.name,id: template._id}));
 				let windCompendium = buffs.filter(buff => buff.name == Wind.WindStrength);
-				WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
+				WeatherMessage += "Wind: " + ( windCompendium.length > 0 ? `@Compendium[pf1-weather-blossems.weather-buffs.${windCompendium[0].id}]{${Wind.WindStrength}}` : Wind.WindStrength) + " (" + Wind.WindSpeed + ")<br>";
 				WeatherMessage += (Wind.RangedWeaponPenalty > 0 ? "Ranged Weapon Penalty: " + Wind.RangedWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.SiegeWeaponPenalty > 0 ? "Siege Weapon Penalty: " + Wind.SiegeWeaponPenalty + "<br>" : "");
 				WeatherMessage += (Wind.CheckSize != "" ? "Check Size: " + Wind.CheckSize + "<br>" : "");
@@ -989,10 +989,10 @@ var pf1Weather = {
 			}
 			WeatherMessage += "</div>";
 			//Add Compendium Journals to end of the message
-			var pack = game.packs.get("pf1-weather.pf1-weather-journals");
+			var pack = game.packs.get("pf1-weather-blossems.pf1-weather-blossems-journals");
 			let journals = [];
 			pack.index.forEach(template => journals.push({name: template.name,id: template._id}));
-			everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather.pf1-weather-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
+			everPercip ? WeatherMessage += `<br>@Compendium[pf1-weather-blossems.pf1-weather-blossems-journals.${journals.filter(journal => journal.name == "Precipitation Weather Rules")[0].id}]{Precipitation Weather Rules}` : console.log("No rules needed");
 			let theDate = pf1Weather.GetDateForNote({
 				year: (SimpleCalendar.api.getCurrentYear().numericRepresentation),
 				month: (SimpleCalendar.api.getCurrentMonth().numericRepresentation-1),
@@ -1150,9 +1150,9 @@ var pf1Weather = {
 Hooks.on("renderApplication", (dialog, html, data) => {
 	//console.log("dialog",dialog);
 	if(dialog.data != null && dialog.data.title == "Weather"){
-		let climate = game.user.getFlag("pf1-weather","climate");
-		let season = game.user.getFlag("pf1-weather","season");
-		let elevation = game.user.getFlag("pf1-weather","elevation");
+		let climate = game.user.getFlag("pf1-weather-blossems","climate");
+		let season = game.user.getFlag("pf1-weather-blossems","season");
+		let elevation = game.user.getFlag("pf1-weather-blossems","elevation");
 		document.querySelector("#climateList").value = climate;
 		document.querySelector("#seasonList").value = season;
 		document.querySelector("#elevationList").value = elevation;
@@ -1164,7 +1164,7 @@ Hooks.once("renderApplication", () =>{
 	if(SimpleCalendar != null){
 		// Adding a button that should show a side panel
 		if(game.user.isGM){
-			SimpleCalendar.api.addSidebarButton("PF1 Weather", "fa-solid fa-cloud", "pf1-weather-panel-class", true, populateSidePanel);
+			SimpleCalendar.api.addSidebarButton("PF1 Weather", "fa-solid fa-cloud", "pf1-weather-blossems-panel-class", true, populateSidePanel);
 		}
 	}
 })
@@ -1175,9 +1175,9 @@ function populateSidePanel(event, element){
 		element.removeChild(element.children[i]);
 	}
 	if(element){
-		let prevClimate = game.user.getFlag("pf1-weather","climate");
-		let prevSeason = game.user.getFlag("pf1-weather","season");
-		let prevElevation = game.user.getFlag("pf1-weather","elevation");
+		let prevClimate = game.user.getFlag("pf1-weather-blossems","climate");
+		let prevSeason = game.user.getFlag("pf1-weather-blossems","season");
+		let prevElevation = game.user.getFlag("pf1-weather-blossems","elevation");
 		
 		
 		const header = document.createElement('h2');
@@ -1241,12 +1241,12 @@ function populateSidePanel(event, element){
 		let buttons = document.createElement("div");
 		//I did all the nonsense above then realized I could have done it this way from the begining... decided it didn't need to be changed above.
 		buttons.innerHTML = `
-			<button id='pf1-weather-roll' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.SimpleCalendarWeatherRolls(document.querySelector('#climateList-SC').value,document.querySelector('#seasonList-SC').value,document.querySelector('#elevationList-SC').value)">Roll Weather</button>
-			<button id='pf1-weather-rem-today' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.RemoveCurrentWeatherReport()">Remove Todays Weather Report</button>
-			<button id='pf1-weather-rem-fut' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.RemoveFutureWeatherReports()">Remove All Future Weather Reports</button>
-			<button id='pf1-weather-rem-fut' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.RemoveCurrentAndFutureWeatherReports()">Remove Today's and All Future Weather Reports</button>
-			<button id='pf1-weather-to-chat' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.OutputCurrentWeatherToChat()">Output Today's Weather to Chat</button>
-			<button id='pf1-weather-to-gm' class='fsc-xb fsc-kf fsc-lf pf1-weather-button' onclick="pf1Weather.OutputCurrentWeatherToWhisper()">Whisper Today's Weather to GM</button>
+			<button id='pf1-weather-blossems-roll' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.SimpleCalendarWeatherRolls(document.querySelector('#climateList-SC').value,document.querySelector('#seasonList-SC').value,document.querySelector('#elevationList-SC').value)">Roll Weather</button>
+			<button id='pf1-weather-blossems-rem-today' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.RemoveCurrentWeatherReport()">Remove Todays Weather Report</button>
+			<button id='pf1-weather-blossems-rem-fut' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.RemoveFutureWeatherReports()">Remove All Future Weather Reports</button>
+			<button id='pf1-weather-blossems-rem-fut' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.RemoveCurrentAndFutureWeatherReports()">Remove Today's and All Future Weather Reports</button>
+			<button id='pf1-weather-blossems-to-chat' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.OutputCurrentWeatherToChat()">Output Today's Weather to Chat</button>
+			<button id='pf1-weather-blossems-to-gm' class='fsc-xb fsc-kf fsc-lf pf1-weather-blossems-button' onclick="pf1Weather.OutputCurrentWeatherToWhisper()">Whisper Today's Weather to GM</button>
 		`;
 		
 		element.append(buttons);
