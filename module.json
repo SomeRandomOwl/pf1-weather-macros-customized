@@ -1,7 +1,7 @@
 {
 	"name": "pf1-weather-blossems",
 	"title": "Pathfinder 1E Weather - (Blosems)",
-	"version": "1.0.11",
+	"version": "1.0.12",
 	"relationships": {
 		"systems": [{
 			"id": "pf1",
@@ -63,11 +63,11 @@
 			"folders": []
 		}
 	],
-	"url": "https://github.com/ntriel/pf1-weather-macros",
-	"download": "https://github.com/ntriel/pf1-weather-macros/archive/v1.0.11.zip",
-	"manifest": "https://raw.githubusercontent.com/ntriel/pf1-weather-macros/main/module.json",
-	"readme": "https://github.com/ntriel/pf1-weather-macros/blob/main/README.md",
-	"changelog": "https://github.com/ntriel/pf1-weather-macros/blob/main/CHANGELOG.md",
-	"bugs": "https://github.com/ntriel/pf1-weather-macros/issues",
+	"url": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized",
+	"download": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/archive/refs/tags/blossem.zip",
+	"manifest": "https://raw.githubusercontent.com/SomeRandomOwl/pf1-weather-macros-customized/refs/heads/main/module.json",
+	"readme": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/blob/main/README.md",
+	"changelog": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/blob/main/CHANGELOG.md",
+	"bugs": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/issues",
 	"allowBugReporter": false
 }
