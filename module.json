@@ -1,7 +1,7 @@
 {
 	"name": "pf1-weather-blossems",
 	"title": "Pathfinder 1E Weather - (Blosems)",
-	"version": "1.0.14",
+	"version": "1.0.16",
 	"relationships": {
 		"systems": [{
 			"id": "pf1",
@@ -15,7 +15,7 @@
 	"socket": true,
 	"authors": [
 		{
-			"name": "Νtriel#9341"
+			"name": "Ntriel#9341"
 		},
 		{
 			"name": "SomeRandomOwl"
@@ -64,7 +64,7 @@
 		}
 	],
 	"url": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized",
-	"download": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/archive/rf-fix.zip",
+	"download": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/archive/pack-rename.zip",
 	"manifest": "https://raw.githubusercontent.com/SomeRandomOwl/pf1-weather-macros-customized/main/module.json",
 	"readme": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/blob/main/README.md",
 	"changelog": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/blob/main/CHANGELOG.md",
