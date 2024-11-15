@@ -1,7 +1,7 @@
 {
 	"name": "pf1-weather-blossems",
 	"title": "Pathfinder 1E Weather - (Blosems)",
-	"version": "1.0.12",
+	"version": "1.0.13",
 	"relationships": {
 		"systems": [{
 			"id": "pf1",
