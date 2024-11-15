@@ -64,7 +64,7 @@
 		}
 	],
 	"url": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized",
-	"download": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/archive/refs/tags/blossem.zip",
+	"download": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/archive/blossem.zip",
 	"manifest": "https://raw.githubusercontent.com/SomeRandomOwl/pf1-weather-macros-customized/main/module.json",
 	"readme": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/blob/main/README.md",
 	"changelog": "https://github.com/SomeRandomOwl/pf1-weather-macros-customized/blob/main/CHANGELOG.md",
