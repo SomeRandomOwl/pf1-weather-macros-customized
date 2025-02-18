@@ -51,9 +51,9 @@
 		}
 	],
 	"compatibility": {
-		"minimum": 10,
+		"minimum": "10",
 		"verified": "11",
-		"maximum": "11"
+		"maximum": "12"
 	},
 	"packFolders": [
 		{
